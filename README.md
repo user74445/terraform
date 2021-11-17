@@ -37,7 +37,9 @@ ignoreboth это сокращение для 2х директив ignorespace a
 11. проверяет условие -d /tmp и возвращает ее статус (0 или 1), наличие каталога /tmp
 
 12. vagrant@vagrant:~$ mkdir /tmp/new_path_dir/
+
     vagrant@vagrant:~$ cp /bin/bash /tmp/new_path_dir/
+	
 	vagrant@vagrant:~$ PATH=/tmp/new_path_dir/:$PATH
 	
 13. at - позволяет планировать выполнение команд в определенное время
