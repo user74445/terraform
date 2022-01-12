@@ -35,6 +35,7 @@ systemd(1)─┬─VBoxService(1048)─┬─{VBoxService}(1049)
 4. Как будет выглядеть команда, которая перенаправит вывод stderr ls на другую сессию терминала?
 
 Вызов из pts/0:  
+
 vagrant@vagrant:~$ ls -l \root 2>/dev/pts/1  
 vagrant@vagrant:~$  
     
