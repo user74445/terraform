@@ -100,6 +100,7 @@ vagrant@vagrant:~$ echo netology > /proc/$$/fd/5
 
 vagrant@vagrant:~$ bash 5>&1  
 vagrant@vagrant:~$ echo netology > /proc.$$/fd/5  
+
 bash: /proc.1114/fd/5: No such file or directory  
 
 vagrant@vagrant:~$ echo netology > /proc/$$/fd/5  
