@@ -5,21 +5,19 @@
 
 Системный вызов команды CD -> chdir("/tmp") 
 
-2. Попробуйте использовать команду file на объекты разных типов на файловой системе. Например:
-vagrant@netology1:~$ file /dev/tty
-/dev/tty: character special (5/0)
-vagrant@netology1:~$ file /dev/sda
-/dev/sda: block special (8/0)
-vagrant@netology1:~$ file /bin/bash
-/bin/bash: ELF 64-bit LSB shared object, x86-64
-Используя strace выясните, где находится база данных file на основании которой она делает свои догадки.
+2. Попробуйте использовать команду file на объекты разных типов на файловой системе. Например:  
+vagrant@netology1:~$ file /dev/tty  
+/dev/tty: character special (5/0)  
+vagrant@netology1:~$ file /dev/sda  
+/dev/sda: block special (8/0)  
+vagrant@netology1:~$ file /bin/bash  
+/bin/bash: ELF 64-bit LSB shared object, x86-64  
 
-Файл базы типов - /usr/share/misc/magic.mgc
-в тексте это:
+Используя strace выясните, где находится база данных file на основании которой она делает свои догадки.  
 
-openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3
+Файл базы типов - /usr/share/misc/magic.mgc  
 
-
+в тексте это:  openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3  
 
 3. Предположим, приложение пишет лог в текстовый файл. Этот файл оказался удален (deleted в lsof), однако возможности сигналом сказать приложению переоткрыть файлы или просто перезапустить приложение – нет.
  Так как приложение продолжает писать в удаленный файл, место на диске постепенно заканчивается. 
@@ -27,14 +25,15 @@ openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3
 
 Попробовал с текстовым редактором vim
 
-vagrant@vagrant:~$ lsof -p 1127
-...
-vim      1127 vagrant    4u   REG  253,0    12288  526898 /home/vagrant/.tst_bash.swp (deleted)
-
-vagrant@vagrant:~$ echo '' >/proc/1126/fd/4
+vagrant@vagrant:~$ lsof -p 1127  
 
 
-где 1127 - PID процесса vim
+vim  &nbsp;  &nbsp;  &nbsp; 1127  &nbsp;  &nbsp;  &nbsp; vagrant &nbsp;  &nbsp;  &nbsp; 4u &nbsp;  &nbsp;  &nbsp; REG &nbsp;  &nbsp;  &nbsp; 253,0 &nbsp;  &nbsp;  &nbsp; 12288 &nbsp;  &nbsp;  &nbsp; 526898 &nbsp;  &nbsp;  &nbsp; /home/vagrant/.tst_bash.swp (deleted)
+
+vagrant@vagrant:~$ echo '' >/proc/1126/fd/4  
+
+где 1127 - PID процесса vim  
+
 4 - дескриптор файла , который предварительно удалил
 
 4. Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?
@@ -47,12 +46,12 @@ root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop
 /usr/sbin/opensnoop-bpfcc
 На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04. Дополнительные сведения по установке.
 
-PID    COMM               FD ERR PATH
-765    vminfo              6   0 /var/run/utmp
-561    dbus-daemon        -1   2 /usr/local/share/dbus-1/system-services
-561    dbus-daemon        18   0 /usr/share/dbus-1/system-services
-561    dbus-daemon        -1   2 /lib/dbus-1/system-services
-561    dbus-daemon        18   0 /var/lib/snapd/dbus-1/system-services/
+PID &nbsp;  &nbsp;  COMM &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FD &nbsp; &nbsp; ERR &nbsp; &nbsp; &nbsp; &nbsp; PATH  
+765 &nbsp; &nbsp;   vminfo &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp;  &nbsp; &nbsp;  6 &nbsp; &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /var/run/utmp  
+561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     -1 &nbsp; &nbsp; &nbsp; &nbsp; 2 &nbsp; &nbsp; &nbsp; &nbsp; /usr/local/share/dbus-1/system-services  
+561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     18 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; /usr/share/dbus-1/system-services  
+561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     -1 &nbsp; &nbsp; &nbsp; &nbsp; 2 &nbsp; &nbsp; &nbsp; &nbsp; /lib/dbus-1/system-services  
+561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     18 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; /var/lib/snapd/dbus-1/system-services/  
 
 
 6. Какой системный вызов использует uname -a? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в /proc, где можно узнать версию ядра и релиз ОС.
@@ -64,12 +63,13 @@ PID    COMM               FD ERR PATH
 Part of the utsname information is also accessible  via  /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}.
 
 
-7. Чем отличается последовательность команд через ; и через && в bash? Например:
-root@netology1:~# test -d /tmp/some_dir; echo Hi
-Hi
-root@netology1:~# test -d /tmp/some_dir && echo Hi
-root@netology1:~#
-Есть ли смысл использовать в bash &&, если применить set -e?
+7. Чем отличается последовательность команд через ; и через && в bash? Например:  
+root@netology1:~# test -d /tmp/some_dir; echo Hi  
+Hi  
+root@netology1:~# test -d /tmp/some_dir && echo Hi  
+root@netology1:~#  
+
+Есть ли смысл использовать в bash &&, если применить set -e?  
 
 && -  условный оператор, 
 а ;  - разделитель последовательных команд
@@ -77,14 +77,15 @@ root@netology1:~#
 test -d /tmp/some_dir && echo Hi - в данном случае echo сработает только при успешном завершении команды test
 
 set -e - прерывает сессию при любом ненулевом значении исполняемых команд в конвеере кроме последней.
-в случае &&  вместе с set -e- не имеет смысла, так как при ошибке, выполнение команд прекратится. 
+
+В случае &&  вместе с set -e- не имеет смысла, так как при ошибке, выполнение команд прекратится. 
 
 8. Из каких опций состоит режим bash set -euxo pipefail и почему его хорошо было бы использовать в сценариях?
 
--e прерывает выполнение исполнения при ошибке любой команды кроме последней в последовательности 
--x вывод трейса простых команд 
--u неустановленные/не заданные параметры и переменные считаются как ошибки, с выводом в stderr текста ошибки и выполнит завершение неинтерактивного вызова
--o pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.
+-e прерывает выполнение исполнения при ошибке любой команды кроме последней в последовательности   
+-x вывод трейса простых команд  
+-u неустановленные/не заданные параметры и переменные считаются как ошибки, с выводом в stderr текста ошибки и выполнит завершение неинтерактивного вызова  
+-o pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.  
 
 Для сценария это повышает детализацию вывода ошибок, и завершит сценарий при наличии ошибок, на любом этапе выполнения сценария, кроме последней завершающей команды.
 
@@ -94,7 +95,7 @@ set -e - прерывает сессию при любом ненулевом з
 
 Самые частые:
 
-S*(S,S+,Ss,Ssl,Ss+) - Процессы ожидающие завершения (спящие с прерыванием "сна")
+S*(S,S+,Ss,Ssl,Ss+) - Процессы ожидающие завершения (спящие с прерыванием "сна")  
 I*(I,I<) - фоновые(бездействующие) процессы ядра
 
 Дополнительные символы это доп характеристики, например приоритет.
