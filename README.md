@@ -42,9 +42,12 @@ vagrant@vagrant:~$ echo '' >/proc/1126/fd/4
 Запись освободится при вызове wait() родительским процессом. 
 
 5. В iovisor BCC есть утилита opensnoop:
-root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop
-/usr/sbin/opensnoop-bpfcc
+root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop  
+/usr/sbin/opensnoop-bpfcc  
+
 На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04. Дополнительные сведения по установке.
+
+Ответ:
 
 PID &nbsp;  &nbsp;  COMM &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FD &nbsp; &nbsp; ERR &nbsp; &nbsp; &nbsp; &nbsp; PATH  
 765 &nbsp; &nbsp;   vminfo &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp;  &nbsp; &nbsp;  6 &nbsp; &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /var/run/utmp  
