@@ -6,13 +6,14 @@
 Системный вызов команды CD -> chdir("/tmp") 
 
 2. Попробуйте использовать команду file на объекты разных типов на файловой системе. Например:  
+```
 vagrant@netology1:~$ file /dev/tty  
 /dev/tty: character special (5/0)  
 vagrant@netology1:~$ file /dev/sda  
 /dev/sda: block special (8/0)  
 vagrant@netology1:~$ file /bin/bash  
 /bin/bash: ELF 64-bit LSB shared object, x86-64  
-
+```
 Используя strace выясните, где находится база данных file на основании которой она делает свои догадки.  
 
 Файл базы типов - /usr/share/misc/magic.mgc  
@@ -67,10 +68,12 @@ Part of the utsname information is also accessible  via  /proc/sys/kernel/{ostyp
 
 
 7. Чем отличается последовательность команд через ; и через && в bash? Например:  
+```
 root@netology1:~# test -d /tmp/some_dir; echo Hi  
 Hi  
 root@netology1:~# test -d /tmp/some_dir && echo Hi  
 root@netology1:~#  
+```
 
 Есть ли смысл использовать в bash &&, если применить set -e?  
 
