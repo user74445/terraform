@@ -1,107 +1,152 @@
-Домашнее задание к занятию "3.3. Операционные системы, лекция 1"
-1. Какой системный вызов делает команда cd? В прошлом ДЗ мы выяснили, что cd не является самостоятельной программой, это shell builtin, поэтому запустить strace непосредственно на cd не получится.
-Тем не менее, вы можете запустить strace на /bin/bash -c 'cd /tmp'. В этом случае вы увидите полный список системных вызовов, которые делает сам bash при старте. Вам нужно найти тот единственный, который относится именно к cd.
-Обратите внимание, что strace выдаёт результат своей работы в поток stderr, а не в stdout.
 
-Системный вызов команды CD -> chdir("/tmp") 
+# Домашнее задание к занятию "4.3. Языки разметки JSON и YAML"
 
-2. Попробуйте использовать команду file на объекты разных типов на файловой системе. Например:  
+
+## Обязательная задача 1
+Мы выгрузили JSON, который получили через API запрос к нашему сервису:
 ```
-vagrant@netology1:~$ file /dev/tty  
-/dev/tty: character special (5/0)  
-vagrant@netology1:~$ file /dev/sda  
-/dev/sda: block special (8/0)  
-vagrant@netology1:~$ file /bin/bash  
-/bin/bash: ELF 64-bit LSB shared object, x86-64  
+    { "info" : "Sample JSON output from our service\t",
+        "elements" :[
+            { "name" : "first",
+            "type" : "server",
+            "ip" : 7175 
+            }
+            { "name" : "second",
+            "type" : "proxy",
+            "ip : 71.78.22.43
+            }
+        ]
+    }
 ```
-Используя strace выясните, где находится база данных file на основании которой она делает свои догадки.  
+  Нужно найти и исправить все ошибки, которые допускает наш сервис
+  
+  - недостаточно кавычек в строке 9 
+ 1: { "info" : "Sample JSON output from our service\t",
+ 2:     "elements" :[
+ 3:         { "name" : "first",
+ 4:         "type" : "server",
+ 5:         "ip" : 7175 
+ 6:         },
+ 7:         { "name" : "second",
+ 8:         "type" : "proxy",
+ 9:         "ip": "71.78.22.43"
+10:         }
+11:     ]
+12: }
 
-Файл базы типов - /usr/share/misc/magic.mgc  
+## Обязательная задача 2
+В прошлый рабочий день мы создавали скрипт, позволяющий опрашивать веб-сервисы и получать их IP. К уже реализованному функционалу нам нужно добавить возможность записи JSON и YAML файлов, описывающих наши сервисы. Формат записи JSON по одному сервису: `{ "имя сервиса" : "его IP"}`. Формат записи YAML по одному сервису: `- имя сервиса: его IP`. Если в момент исполнения скрипта меняется IP у сервиса - он должен так же поменяться в yml и json файле.
 
-в тексте это:  openat(AT_FDCWD, "/usr/share/misc/magic.mgc", O_RDONLY) = 3  
+### Ваш скрипт:
 
-3. Предположим, приложение пишет лог в текстовый файл. Этот файл оказался удален (deleted в lsof), однако возможности сигналом сказать приложению переоткрыть файлы или просто перезапустить приложение – нет.
- Так как приложение продолжает писать в удаленный файл, место на диске постепенно заканчивается. 
-Основываясь на знаниях о перенаправлении потоков предложите способ обнуления открытого удаленного файла (чтобы освободить место на файловой системе).
+```python
 
-Попробовал с текстовым редактором vim
+import socket as s
+import time as t
+import datetime as dt
+import json
+import yaml
 
-vagrant@vagrant:~$ lsof -p 1127  
+# set variables 
+i     = 1
+wait  = 2 # интервал проверок в секундах
+srv   = {'drive.google.com':'0.0.0.0', 'mail.google.com':'0.0.0.0', 'google.com':'0.0.0.0'}
+init  = 0
+fpath = "F:\devops-netology\python\\" #путь к файлам конфигов
+flog  = "F:\devops-netology\python\error.log" #путь к файлам логов
 
+# start script workflow
+print('*** start script ***')
+print(srv)
+print('********************')
 
-vim  &nbsp;  &nbsp;  &nbsp; 1127  &nbsp;  &nbsp;  &nbsp; vagrant &nbsp;  &nbsp;  &nbsp; 4u &nbsp;  &nbsp;  &nbsp; REG &nbsp;  &nbsp;  &nbsp; 253,0 &nbsp;  &nbsp;  &nbsp; 12288 &nbsp;  &nbsp;  &nbsp; 526898 &nbsp;  &nbsp;  &nbsp; /home/vagrant/.tst_bash.swp (deleted)
+while 1 == 1 : # для бесконечного цикла, else  установить условие i >= чилу треуемых итераций
+  for host in srv:
+    is_error = False 
+    ip = s.gethostbyname(host)
+    if ip != srv[host]:
+      if i==1 and init !=1: # выведем ошибку, если нет инициализации или есть иниц. и не первый шаг
+        is_error=True
+        # вывод ошибок в файл
+        with open(flog,'a') as fl:
+          print(str(dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +' [ERROR] ' + str(host) +' IP mistmatch: '+srv[host]+' '+ip,file=fl)
+        #******************************************
+        # решение 4.3 - п2
+        #vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+        #  в отдельные файлы
+        # json
+        with open(fpath+host+".json",'w') as jsf:
+          json_data= json.dumps({host:ip})
+          jsf.write(json_data) 
+        # yaml
+        with open(fpath+host+".yaml",'w') as ymf:
+          yaml_data= yaml.dump([{host : ip}])
+          ymf.write(yaml_data) 
+    # в один общий файл     
+    if is_error:
+      data = []  
+      for host in srv:  
+        data.append({host:ip})
+      with open(fpath+"services_conf.json",'w') as jsf:
+        json_data= json.dumps(data)
+        jsf.write(json_data)
+      with open(fpath+"services_conf.yaml",'w') as ymf:
+        yaml_data= yaml.dump(data)
+        ymf.write(yaml_data)
+        #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      srv[host]=ip
+  i+=1 # счетчик итераций для отладки
+  if i >=50 : # число итераций для выхода из цикла для отладки
+    break
+  t.sleep(wait) # задержка на итерации  
 
-vagrant@vagrant:~$ echo '' >/proc/1126/fd/4  
-
-где 1127 - PID процесса vim  
-
-4 - дескриптор файла , который предварительно удалил
-
-4. Занимают ли зомби-процессы какие-то ресурсы в ОС (CPU, RAM, IO)?
-
-"Зомби" процессы, в отличии от "сирот" освобождают свои ресурсы, но не освобождают запись в таблице процессов. 
-Запись освободится при вызове wait() родительским процессом. 
-
-5. В iovisor BCC есть утилита opensnoop:
-root@vagrant:~# dpkg -L bpfcc-tools | grep sbin/opensnoop  
-/usr/sbin/opensnoop-bpfcc  
-
-На какие файлы вы увидели вызовы группы open за первую секунду работы утилиты? Воспользуйтесь пакетом bpfcc-tools для Ubuntu 20.04. Дополнительные сведения по установке.
-
-Ответ:
-
-PID &nbsp;  &nbsp;  COMM &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; FD &nbsp; &nbsp; ERR &nbsp; &nbsp; &nbsp; &nbsp; PATH  
-765 &nbsp; &nbsp;   vminfo &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp;  &nbsp; &nbsp;  6 &nbsp; &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; /var/run/utmp  
-561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     -1 &nbsp; &nbsp; &nbsp; &nbsp; 2 &nbsp; &nbsp; &nbsp; &nbsp; /usr/local/share/dbus-1/system-services  
-561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     18 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; /usr/share/dbus-1/system-services  
-561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     -1 &nbsp; &nbsp; &nbsp; &nbsp; 2 &nbsp; &nbsp; &nbsp; &nbsp; /lib/dbus-1/system-services  
-561  &nbsp; &nbsp;  dbus-daemon   &nbsp; &nbsp;     18 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; /var/lib/snapd/dbus-1/system-services/  
-
-
-6. Какой системный вызов использует uname -a? Приведите цитату из man по этому системному вызову, где описывается альтернативное местоположение в /proc, где можно узнать версию ядра и релиз ОС.
-
-системный вызов uname()
-
-Цитата :
-
-Part of the utsname information is also accessible  via  /proc/sys/kernel/{ostype, hostname, osrelease, version, domainname}.
-
-
-7. Чем отличается последовательность команд через ; и через && в bash? Например:  
 ```
-root@netology1:~# test -d /tmp/some_dir; echo Hi  
-Hi  
-root@netology1:~# test -d /tmp/some_dir && echo Hi  
-root@netology1:~#  
+
+
+### Вывод скрипта при запуске при тестировании:
+```
+*** start script ***
+{'drive.google.com': '0.0.0.0', 'mail.google.com': '0.0.0.0', 'google.com': '0.0.0.0'}
+********************
+0
+
 ```
 
-Есть ли смысл использовать в bash &&, если применить set -e?  
+### json-файл(ы), который(е) записал ваш скрипт:
+```json
 
-&& -  условный оператор, 
-а ;  - разделитель последовательных команд
+файл drive.google.com.json
+{"drive.google.com": "74.125.205.194"}
 
-test -d /tmp/some_dir && echo Hi - в данном случае echo сработает только при успешном завершении команды test
+файл mail.google.com.json
+{"mail.google.com": "216.58.210.165"}
 
-set -e - прерывает сессию при любом ненулевом значении исполняемых команд в конвеере кроме последней.
+файл google.com.json
+{"google.com": "216.58.210.142"}
 
-В случае &&  вместе с set -e- не имеет смысла, так как при ошибке, выполнение команд прекратится. 
+общий файл 
+[{"drive.google.com": "216.58.210.142"}, {"mail.google.com": "216.58.210.142"}, {"google.com": "216.58.210.142"}]
 
-8. Из каких опций состоит режим bash set -euxo pipefail и почему его хорошо было бы использовать в сценариях?
 
--e прерывает выполнение исполнения при ошибке любой команды кроме последней в последовательности   
--x вывод трейса простых команд  
--u неустановленные/не заданные параметры и переменные считаются как ошибки, с выводом в stderr текста ошибки и выполнит завершение неинтерактивного вызова  
--o pipefail возвращает код возврата набора/последовательности команд, ненулевой при последней команды или 0 для успешного выполнения команд.  
+```
 
-Для сценария это повышает детализацию вывода ошибок, и завершит сценарий при наличии ошибок, на любом этапе выполнения сценария, кроме последней завершающей команды.
+### yml-файл(ы), который(е) записал ваш скрипт:
+```yaml
 
-9. Используя -o stat для ps, определите, какой наиболее часто встречающийся статус у процессов в системе. 
-В man ps ознакомьтесь (/PROCESS STATE CODES) что значат дополнительные к основной заглавной буквы статуса процессов. 
-Его можно не учитывать при расчете (считать S, Ss или Ssl равнозначными).
+файл drive.google.com.yaml
+- drive.google.com: 74.125.205.194
 
-Самые частые:
+файл mail.google.com.yaml
+- mail.google.com: 216.58.210.165
 
-S*(S,S+,Ss,Ssl,Ss+) - Процессы ожидающие завершения (спящие с прерыванием "сна")  
-I*(I,I<) - фоновые(бездействующие) процессы ядра
+файл google.com.yaml
+- google.com: 216.58.210.142
 
-Дополнительные символы это доп характеристики, например приоритет.
+общий файл 
+
+- drive.google.com: 216.58.210.142
+- mail.google.com: 216.58.210.142
+- google.com: 216.58.210.142
+
+```
+
