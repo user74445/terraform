@@ -1,325 +1,151 @@
-Домашнее задание к занятию "3.5. Файловые системы"
-1. Узнайте о sparse (разряженных) файлах.
+1. Необязательное задание: можно посмотреть целый фильм в консоли telnet towel.blinkenlights.nl :)
 
- Изучил. 
+2. Узнайте о том, сколько действительно независимых (не пересекающихся) каналов есть в разделяемой среде WiFi при работе на 2.4 ГГц. Стандарты с полосой 5 ГГц более актуальны, но регламенты на 5 ГГц существенно различаются в разных странах, а так же не раз обновлялись. В качестве дополнительного вопроса вне зачета, попробуйте найти актуальный ответ и на этот вопрос.
 
-2. Могут ли файлы, являющиеся жесткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
+2.4GHz
+Всего 14 каналов, 
+С учетом того, что в стандарте предуссмотрена разная ширина канала : 10, 20, 22, 40, 80 и 160 МГц, основные 20 и 40 используются
+при ширне канала = 40 МГц, всего 3 непересекающихся канала: 1,6,11.
+каналы шириной 80 и 160 МГц в диапазон 2.4 ГГц, не имеют не пересекающихся каналов.
 
-Так как hardlink это ссылка на тот же самый файл и имеет тот же inode то права будут одни и теже.
-
-3. Сделайте vagrant destroy на имеющийся инстанс Ubuntu. Замените содержимое Vagrantfile следующим:
-```
-Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-20.04"
-  config.vm.provider :virtualbox do |vb|
-    lvm_experiments_disk0_path = "/tmp/lvm_experiments_disk0.vmdk"
-    lvm_experiments_disk1_path = "/tmp/lvm_experiments_disk1.vmdk"
-    vb.customize ['createmedium', '--filename', lvm_experiments_disk0_path, '--size', 2560]
-    vb.customize ['createmedium', '--filename', lvm_experiments_disk1_path, '--size', 2560]
-    vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', lvm_experiments_disk0_path]
-    vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', lvm_experiments_disk1_path]
-  end
-end
+5GHz
+В разных странах разрешенные разные 
+По разрешенным каналам в РФ:
+20Мгц - 17 каналов
+40Мгц - 8
+80Мгц - 4
+160Мгц -1
 
 
-Данная конфигурация создаст новую виртуальную машину с двумя дополнительными неразмеченными дисками по 2.5 Гб.
+3. Адрес канального уровня – MAC адрес – это 6 байт, первые 3 из которых называются OUI – Organizationally Unique Identifier или уникальный идентификатор организации. Какому производителю принадлежит MAC 38:f9:d3:55:55:79?
 
-NAME                      MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-loop0                       7:0    0 55.4M  1 loop /snap/core18/2128
-loop1                       7:1    0 32.3M  1 loop /snap/snapd/12704
-loop2                       7:2    0 70.3M  1 loop /snap/lxd/21029
-loop3                       7:3    0 55.5M  1 loop /snap/core18/2284
-loop4                       7:4    0 43.4M  1 loop /snap/snapd/14549
-loop5                       7:5    0 61.9M  1 loop /snap/core20/1270
-loop6                       7:6    0 67.2M  1 loop /snap/lxd/21835
-sda                         8:0    0   64G  0 disk
-├─sda1                      8:1    0    1M  0 part
-├─sda2                      8:2    0    1G  0 part /boot
-└─sda3                      8:3    0   63G  0 part
-  └─ubuntu--vg-ubuntu--lv 253:0    0 31.5G  0 lvm  /
-sdb                         8:16   0  2.5G  0 disk
-sdc                         8:32   0  2.5G  0 disk
-```
-4. Используя fdisk, разбейте первый диск на 2 раздела: 2 Гб, оставшееся пространство.
-```
-Выполнено.
-    
-Device     Boot   Start     End Sectors  Size Id Type
-/dev/sdb1          2048 4196351 4194304    2G 83 Linux
-/dev/sdb2       4196352 5242879 1046528  511M 83 Linux
-```
-5. Используя sfdisk, перенесите данную таблицу разделов на второй диск.
-```
-root@vagrant:~# sfdisk -d /dev/sdb|sfdisk --force /dev/sdc
-Checking that no-one is using this disk right now ... OK
+Производитель: компания Apple
 
-Disk /dev/sdc: 2.51 GiB, 2684354560 bytes, 5242880 sectors
-Disk model: VBOX HARDDISK   
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
+10:19:37 gmi@upc(0):~/mac_check$ ./oui.sh 38:f9:d3:55:55:79
+Для MAC 38:f9:d3:55:55:79 найдена следующая информация:
+38F9D3     (base 16)		Apple, Inc.
+				1 Infinite Loop
+				Cupertino  CA  95014
+				US
 
->>> Script header accepted.
->>> Script header accepted.
->>> Script header accepted.
->>> Script header accepted.
->>> Created a new DOS disklabel with disk identifier 0xb289fd48.
-/dev/sdc1: Created a new partition 1 of type 'Linux' and of size 2 GiB.
-/dev/sdc2: Created a new partition 2 of type 'Linux' and of size 511 MiB.
-/dev/sdc3: Done.
+4. Каким будет payload TCP сегмента, если Ethernet MTU задан в 9001 байт, размер заголовков IPv4 – 20 байт, а TCP – 32 байта?
 
-New situation:
-Disklabel type: dos
-Disk identifier: 0xb289fd48
+TCP Segment = 8981 (MTU - Ethernet Header)
 
-Device     Boot   Start     End Sectors  Size Id Type
-/dev/sdc1          2048 4196351 4194304    2G 83 Linux
-/dev/sdc2       4196352 5242879 1046528  511M 83 Linux
+5. Может ли во флагах TCP одновременно быть установлены флаги SYN и FIN при штатном режиме работы сети? Почему да или нет?
 
-The partition table has been altered.
-Calling ioctl() to re-read partition table.
-Syncing disks.
+Не могут, так как SYN - начинает соединение, а FIN завершает, 
+Одним пакетом нельзя одновременно и открыть и закрыть сессию.
 
-```
+6 . ss -ula sport = :53 на хосте имеет следующий вывод:
 
-6. Соберите mdadm RAID1 на паре разделов 2 Гб.
-```
-root@vagrant:~# mdadm --create --verbose /dev/md1 -l 1 -n 2 /dev/sd{b1,c1}
-mdadm: Note: this array has metadata at the start and
-    may not be suitable as a boot device.  If you plan to
-    store '/boot' on this device please ensure that
-    your boot-loader understands md/v1.x metadata, or use
-    --metadata=0.90
-mdadm: size set to 2094080K
-Continue creating array? y
-mdadm: Defaulting to version 1.2 metadata
-mdadm: array /dev/md1 started.
-root@vagrant:~# 
-```
+State           Recv-Q          Send-Q                   Local Address:Port                     Peer Address:Port          Process
+UNCONN          0               0                        127.0.0.53%lo:domain                        0.0.0.0:*
+Почему в State присутствует только UNCONN, и может ли там присутствовать, например, TIME-WAIT?
 
-7. Соберите mdadm RAID0 на второй паре маленьких разделов.
-```
-root@vagrant:~# mdadm --create --verbose /dev/md0 -l 1 -n 2 /dev/sd{b2,c2}
-mdadm: Note: this array has metadata at the start and
-    may not be suitable as a boot device.  If you plan to
-    store '/boot' on this device please ensure that
-    your boot-loader understands md/v1.x metadata, or use
-    --metadata=0.90
-mdadm: size set to 522240K
-Continue creating array? н
-Continue creating array? (y/n) y
-mdadm: Defaulting to version 1.2 metadata
-mdadm: array /dev/md0 started.
-root@vagrant:~# 
-```
-8. Создайте 2 независимых PV на получившихся md-устройствах.
-```
-root@vagrant:~# pvcreate /dev/md1 /dev/md0
-  Physical volume "/dev/md1" successfully created.
-  Physical volume "/dev/md0" successfully created.
-```
-9. Создайте общую volume-group на этих двух PV.
-```
-root@vagrant:~# vgcreate vg1 /dev/md1 /dev/md0
-  Volume group "vg1" successfully created
+UNCONN - соединение не установлено,
+Time-wait - это состояние когда сокет отправил подтверждение о получении завершения соединение и ждет, что сообщение доставлено.
+Так как -u сообщает нам про вывод UDP порта, а он не использует предварительные пакеты для соеинения и синхронизации, 
+следовательно и для разрыва соединения ему не нужно ждать завершения сессии.
 
-root@vagrant:~# vgdisplay
-  --- Volume group ---
-  VG Name               vgvagrant
-  System ID             
-  Format                lvm2
-  Metadata Areas        1
-  Metadata Sequence No  3
-  VG Access             read/write
-  VG Status             resizable
-  MAX LV                0
-  Cur LV                2
-  Open LV               2
-  Max PV                0
-  Cur PV                1
-  Act PV                1
-  VG Size               <63.50 GiB
-  PE Size               4.00 MiB
-  Total PE              16255
-  Alloc PE / Size       16255 / <63.50 GiB
-  Free  PE / Size       0 / 0   
-  VG UUID               6zL1A7-9ldG-J06H-1Pqu-m7we-mAzr-wBnOoF
-   
-  --- Volume group ---
-  VG Name               vg1
-  System ID             
-  Format                lvm2
-  Metadata Areas        2
-  Metadata Sequence No  1
-  VG Access             read/write
-  VG Status             resizable
-  MAX LV                0
-  Cur LV                0
-  Open LV               0
-  Max PV                0
-  Cur PV                2
-  Act PV                2
-  VG Size               2.49 GiB
-  PE Size               4.00 MiB
-  Total PE              638
-  Alloc PE / Size       0 / 0   
-  Free  PE / Size       638 / 2.49 GiB
-  VG UUID               toJQnc-yOx3-L4uF-35cS-agip-bkwo-5Sz4ol
-```
-10. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
-```
-root@vagrant:~# lvcreate -L 100M vg1 /dev/md0
-  Logical volume "lvol0" created.
-root@vagrant:~# vgs
-  VG        #PV #LV #SN Attr   VSize   VFree
-  vg1         2   1   0 wz--n-   2.49g 2.39g
-  vgvagrant   1   2   0 wz--n- <63.50g    0 
-root@vagrant:~# lvs
-  LV     VG        Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
-  lvol0  vg1       -wi-a----- 100.00m                                                    
-  root   vgvagrant -wi-ao---- <62.54g                                                    
-  swap_1 vgvagrant -wi-ao---- 980.00m  
-```
-11. Создайте mkfs.ext4 ФС на получившемся LV.
-```
-root@vagrant:~# mkfs.ext4 /dev/vg1/lvol0
-mke2fs 1.45.5 (07-Jan-2020)
-Creating filesystem with 25600 4k blocks and 25600 inodes
+7. Обладая знаниями о том, как штатным образом завершается соединение (FIN от инициатора, FIN-ACK от ответчика, ACK от инициатора), опишите в каких состояниях будет находиться TCP соединение в каждый момент времени на клиенте и на сервере при завершении. Схема переходов состояния соединения вам в этом поможет.
 
-Allocating group tables: done                            
-Writing inode tables: done                            
-Creating journal (1024 blocks): done
-Writing superblocks and filesystem accounting information: done
-```
-12. Смонтируйте этот раздел в любую директорию, например, /tmp/new.
-```
-root@vagrant:~# mkdir /tmp/new
-root@vagrant:~# mount /dev/vg1/lvol0 /tmp/new
-```
+                    Client           Server 
+                 ESTABLESHED      ESTABLESHED
+1. >> FIN        FIN WAIT 1   >   CLOSE WAIT
+2. << FIN-ACC    FIN WAIT 2   >   CLOSE WAIT 
+3. >> ACK        TIME WAIT    <   LAST ACK
+                 CLOSED       >   CLOSED
 
-13. Поместите туда тестовый файл, например wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz.
-```
-root@vagrant:~# wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz
---2022-02-01 14:50:09--  https://mirror.yandex.ru/ubuntu/ls-lR.gz
-Resolving mirror.yandex.ru (mirror.yandex.ru)... 213.180.204.183, 2a02:6b8::183
-Connecting to mirror.yandex.ru (mirror.yandex.ru)|213.180.204.183|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 20488555 (20M) [application/octet-stream]
-Saving to: ‘/tmp/new/test.gz’
 
-/tmp/new/test.gz     100%[=====================>]  19.54M  6.65MB/s    in 2.9s    
+8 . TCP порт – 16 битное число. Предположим, 2 находящихся в одной сети хоста устанавливают между собой соединения. Каким будет теоретическое максимальное число соединений, ограниченное только лишь параметрами L4, которое параллельно может установить клиент с одного IP адреса к серверу с одним IP адресом? Сколько соединений сможет обслужить сервер от одного клиента? А если клиентов больше одного?
 
-2022-02-01 14:50:12 (6.65 MB/s) - ‘/tmp/new/test.gz’ saved [20488555/20488555]
+Максимальное число портов  = 65535 (макс значение в 16 бит)
+В теории максимальное число соединений от одного клиента для сервера может быть  = 65535 
+В теории может быть открыт 1 порт на каждого клиента и слушать 65535 соединений клиента
+уникальным должна быть пара SERVER_IP:PORT - Client_IP:PORT 
+в таком варианте это 65535 клиентов, и с каждым 65535 соединений, но боюсь тут может не хватить дескрипторов в ОС и других ресурсов
 
-root@vagrant:~# ls -l /tmp/new
-total 20012
--rw-r--r-- 1 root root 20488555 Feb 01 14:17 test.gz
-root@vagrant:~# 
-```
-14. Прикрепите вывод lsblk.
-```
-root@vagrant:~# lsblk
-NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
-sda                    8:0    0   64G  0 disk  
-├─sda1                 8:1    0  512M  0 part  /boot/efi
-├─sda2                 8:2    0    1K  0 part  
-└─sda5                 8:5    0 63.5G  0 part  
-  ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
-  └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
-sdb                    8:16   0  2.5G  0 disk  
-├─sdb1                 8:17   0    2G  0 part  
-│ └─md1                9:1    0    2G  0 raid1 
-└─sdb2                 8:18   0  511M  0 part  
-  └─md0                9:0    0  510M  0 raid1 
-    └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
-sdc                    8:32   0  2.5G  0 disk  
-├─sdc1                 8:33   0    2G  0 part  
-│ └─md1                9:1    0    2G  0 raid1 
-└─sdc2                 8:34   0  511M  0 part  
-  └─md0                9:0    0  510M  0 raid1 
-    └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
-```
-15. Протестируйте целостность файла:
-```
-root@vagrant:~# gzip -t /tmp/new/test.gz
-root@vagrant:~# echo $?
-0
+9. Может ли сложиться ситуация, при которой большое число соединений TCP на хосте находятся в состоянии TIME-WAIT? Если да, то является ли она хорошей или плохой? Подкрепите свой ответ пояснением той или иной оценки.
 
-root@vagrant:~# gzip -t /tmp/new/test.gz && echo $?
-0
-```
-16. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
-```
-root@vagrant:~# pvmove /dev/md0
-  /dev/md0: Moved: 12.00%
-  /dev/md0: Moved: 100.00%
-root@vagrant:~# lsblk
-NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
-sda                    8:0    0   64G  0 disk  
-├─sda1                 8:1    0  512M  0 part  /boot/efi
-├─sda2                 8:2    0    1K  0 part  
-└─sda5                 8:5    0 63.5G  0 part  
-  ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
-  └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
-sdb                    8:16   0  2.5G  0 disk  
-├─sdb1                 8:17   0    2G  0 part  
-│ └─md1                9:1    0    2G  0 raid1 
-│   └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
-└─sdb2                 8:18   0  511M  0 part  
-  └─md0                9:0    0  510M  0 raid1 
-sdc                    8:32   0  2.5G  0 disk  
-├─sdc1                 8:33   0    2G  0 part  
-│ └─md1                9:1    0    2G  0 raid1 
-│   └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
-└─sdc2                 8:34   0  511M  0 part  
-  └─md0                9:0    0  510M  0 raid1 
-root@vagrant:~#
-```
-17. Сделайте --fail на устройство в вашем RAID1 md.
-```
-root@vagrant:~# mdadm /dev/md1 --fail /dev/sdb1
-mdadm: set /dev/sdb1 faulty in /dev/md1
+Да может, при частом соединении и отсоединении.
+При частом соединении и отключении создается соединение и соотвествено выделяется каждый раз порт
+и предыдущая сессия какое-то время остаётся незакрытой, новая сессия может начаться раньше чем будет закрыта предудущая 
+и при большом числе соединений такое может вызвать накопление соединение и расход соответсвующих ресурсов.
+А если все соеднения идут к одной службе, то может так же возникнуть ситуация когда кончаться порты. 
 
-root@vagrant:~# mdadm -D /dev/md1
-/dev/md1:
-           Version : 1.2
-*******
-Consistency Policy : resync
 
-              Name : vagrant:1  (local to host vagrant)
-              UUID : 1aac0a29:
-root@vagrant:~# mdadm -D /dev/md1
-/dev/md1:
-           Version : 1.2
-0fa0dc73:082e1042:fe00b376
-            Events : 19
+10. Чем особенно плоха фрагментация UDP относительно фрагментации TCP?
 
-    Number   Major   Minor   RaidDevice State
-       -       0        0        0      removed
-       1       8       33        1      active sync   /dev/sdc1
+Если один из фрагментов не дойдет, то необходимо перепослать весь пакет снова, 
+но в UDP нет контроля ошибок, и как следствие информация не дойдет.
 
-       0       8       17        -      faulty   /dev/sdb1
-```
-18. Подтвердите выводом dmesg, что RAID1 работает в деградированном состоянии.
-```
-root@vagrant:~# dmesg |grep md1
-[  480.422928] md/raid1:md1: not clean -- starting background reconstruction
-[  480.422930] md/raid1:md1: active with 2 out of 2 mirrors
-[  480.422945] md1: detected capacity change from 0 to 2144337920
-[  480.425781] md: resync of RAID array md1
-[  490.758344] md: md1: resync done.
-[ 2325.890719] md/raid1:md1: Disk failure on sdb1, disabling device.
-               md/raid1:md1: Operation continuing on 1 devices.
-```
-19. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
-```
-root@vagrant:~# gzip -t /tmp/new/test.gz
-root@vagrant:~# echo $?
-0
 
-root@vagrant:~# gzip -t /tmp/new/test.gz && echo $?
-0
-```
-20. Погасите тестовый хост, vagrant destroy.
+11. Если бы вы строили систему удаленного сбора логов, то есть систему, в которой несколько хостов отправяют на центральный узел генерируемые приложениями логи (предположим, что логи – текстовая информация), какой протокол транспортного уровня вы выбрали бы и почему? Проверьте ваше предположение самостоятельно, узнав о стандартном протоколе syslog.
 
-20:10:43 gmi@upc(0):~/vagrant$ vagrant destroy
+Я бы использовал TCP, так как есть механизм гарантированной доставки пакетов, чего нет в UDP, а для логов это самое важное.
+Например logstash использует TCP (http)
+
+Первоначально syslog использовал UDP, но в следующей редакции использовался TCP.
+
+12. Сколько портов TCP находится в состоянии прослушивания на вашей виртуальной машине с Ubuntu, и каким процессам они принадлежат?
+ 
+ vagrant@netology1:~$ sudo ss  state listening -t -p
+Recv-Q      Send-Q           Local Address:Port             Peer Address:Port     Process                                                       
+0           4096                   0.0.0.0:sunrpc                0.0.0.0:*         users:(("rpcbind",pid=545,fd=4),("systemd",pid=1,fd=74))     
+0           511                    0.0.0.0:http                  0.0.0.0:*         users:(("nginx",pid=8914,fd=6),("nginx",pid=8913,fd=6))      
+0           4096             127.0.0.53%lo:domain                0.0.0.0:*         users:(("systemd-resolve",pid=546,fd=13))                    
+0           128                    0.0.0.0:ssh                   0.0.0.0:*         users:(("sshd",pid=973,fd=3))                                
+0           4096                      [::]:sunrpc                   [::]:*         users:(("rpcbind",pid=545,fd=6),("systemd",pid=1,fd=76))     
+0           511                       [::]:http                     [::]:*         users:(("nginx",pid=8914,fd=7),("nginx",pid=8913,fd=7))      
+0           128                       [::]:ssh                      [::]:*         users:(("sshd",pid=973,fd=4))                                
+
+Прослушиваемых портов = 5 IPv4 + 8IPv6
+Процессы соответсвенно: systemd,sshd,nginx
+ 
+13. Какой ключ нужно добавить в tcpdump, чтобы он начал выводить не только заголовки, но и содержимое фреймов в текстовом виде? А в текстовом и шестнадцатиричном?
+
+tcpdump -A - выведет содержание в ASCII (в тексте)
+
+vagrant@netology1:~$ sudo tcpdump -A -c 1
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+15:02:36.478937 IP netology1.ssh > _gateway.60694: Flags [P.], seq 4239266463:4239266499, ack 25264635, win 62780, length 36
+E..L..@.@..m
+...
+...............P..<.O..f....
+....Zi&:.........Q.....>.`..5s
+1 packet captured
+36 packets received by filter
+3 packets dropped by kernel
+
+tcpdump -x - выведет соедржимое пакетов в hex
+
+vagrant@netology1:~$ sudo tcpdump -x -c 1
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+15:02:51.766283 IP netology1.ssh > _gateway.60694: Flags [P.], seq 4239268351:4239268387, ack 25265535, win 62780, length 36
+	0x0000:  4510 004c 9850 4000 4006 8a3b 0a00 020f
+	0x0010:  0a00 0202 0016 ed16 fcae 19ff 0181 857f
+	0x0020:  5018 f53c 184f 0000 2a9c 92a8 21ac 4618
+	0x0030:  4462 299f e297 ed3f 8572 c987 fd6c cbeb
+	0x0040:  a8be 0a65 54a2 0dce f927 e3f6
+1 packet captured
+50 packets received by filter
+17 packets dropped by kernel
+
+tcpdump -XX - выведет соедржимое пакетов в hex
+
+14. Попробуйте собрать дамп трафика с помощью tcpdump на основном интерфейсе вашей виртуальной машины и посмотреть его через tshark или Wireshark (можно ограничить число пакетов -c 100). Встретились ли вам какие-то установленные флаги Internet Protocol (не флаги TCP, а флаги IP)? Узнайте, какие флаги бывают. Как на самом деле называется стандарт Ethernet, фреймы которого попали в ваш дамп? Можно ли где-то в дампе увидеть OUI?
+
+Собирал дамп на хостовой машине(так же Ubuntu 20.4), 
+
+Встретил флаги IP: Don't fragment(второй бит 0 1 0), 
+Всего 3 бита:
+    0 - зарезервиравано, всегда 0,
+    1 - указывает на фрагментирование , 0 - разрешена фрагментация, 1 - нет
+    2 - указывает на конец фрагментированных пакетов , 1 - не последний фрагмент (актуально для 1го бита = 0)
+Ethernet называется Ethernet II
+
+В дампе OUI можно увидеть в заголовке Ethernet пакета в виде короткого имени и ID (часть MACа)
+например: Destination: HonHaiPr_8c:ed:c5 (c0:38:96:8c:ed:c5)
