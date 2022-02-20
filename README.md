@@ -8,7 +8,7 @@ HOST: stackoverflow.com
 [press enter]
 В ответе укажите полученный HTTP код, что он означает?
 
-
+```
 HTTP/1.0 301 Moved Permanently
 Connection: Close
 X-Tracking-Ref: <0.13257.2075>
@@ -27,6 +27,8 @@ X-Timer: S1645085743.173156,VS0,VE78
 Vary: Fastly-SSL
 X-DNS-Prefetch-Control: off
 Set-Cookie: prov=8da06b60-1829-928a-899f-0004fd81e917; domain=.stackoverflow.com; expires=Fri, 01-Jan-2055 00:00:00 GMT; path=/; HttpOnly
+```
+
 
 301 Moved Permanently — запрошенный документ был окончательно перенесен на новый URI, указанный в поле Location заголовка. 
 
@@ -37,11 +39,14 @@ Set-Cookie: prov=8da06b60-1829-928a-899f-0004fd81e917; domain=.stackoverflow.com
 найдите первый ответ HTTP сервера, откройте вкладку Headers
 укажите в ответе полученный HTTP код.
 
+
+```
 Request URL: https://stackoverflow.com/
 Request Method: GET
 Status Code: 200 
 Remote Address: 151.101.129.69:443
 Referrer Policy: no-referrer-when-downgrade
+```
 
 проверьте время загрузки страницы, какой запрос обрабатывался дольше всего?
 
@@ -50,21 +55,21 @@ Referrer Policy: no-referrer-when-downgrade
 приложите скриншот консоли браузера в ответ.
 
 3. Какой IP адрес у вас в интернете?
-
+```
 vagrant@vagrant:~$ dig @resolver4.opendns.com myip.opendns.com +short
 77.40.61.12
-
+```
 4. Какому провайдеру принадлежит ваш IP адрес? Какой автономной системе AS? Воспользуйтесь утилитой whois
-
+```
 vagrant@vagrant:~$ whois 77.40.61.12 | grep ^descr
 descr:          xDSL dynamic pools
 descr:          Rostelecom networks
 
 vagrant@vagrant:~$ whois 77.40.61.12 | grep ^origin
 origin:         AS12389
-
+```
 5. Через какие сети проходит пакет, отправленный с вашего компьютера на адрес 8.8.8.8? Через какие AS? Воспользуйтесь утилитой traceroute
-
+```
 vagrant@vagrant:~$ traceroute 8.8.8.8 -I
 traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
  1  10.0.2.2 [*]  0.347 ms  0.312 ms  0.218 ms
@@ -88,17 +93,17 @@ traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
 19  * * *
 20  * * *
 21  8.8.8.8 [AS15169]  35.353 ms  32.115 ms 
-
+```
 Пакет проходит через AS - AS12389, AS15169
-
+```
 $ grep org-name <(whois AS12389)
 org-name:       PJSC Rostelecom
 $ grep OrgName <(whois AS15169)
 OrgName:        Google LLC
-
+```
 
 6. Повторите задание 5 в утилите mtr. На каком участке наибольшая задержка - delay?
-
+```
 vagrant@vagrant:~$ mtr 8.8.8.8 -znrc 1
 Start: 2022-02-19T08:59:51+0000
 HOST: vagrant                     Loss%   Snt   Last   Avg  Best  Wrst StDev
@@ -123,22 +128,22 @@ HOST: vagrant                     Loss%   Snt   Last   Avg  Best  Wrst StDev
  19. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
  20. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
  21. AS15169  8.8.8.8              0.0%     1   31.2  31.2  31.2  31.2   0.0
-
+```
 Наибольшая задержка на 11 хопе
 
 7. Какие DNS сервера отвечают за доменное имя dns.google? Какие A записи? воспользуйтесь утилитой dig
-
+```
 vagrant@vagrant:~$ dig +short NS dns.google
 ns1.zdns.google.
 ns2.zdns.google.
 ns3.zdns.google.
 ns4.zdns.google.
-
+```
 8. Проверьте PTR записи для IP адресов из задания 7. Какое доменное имя привязано к IP? воспользуйтесь утилитой dig
-
+```
 $ for ip in `dig +short A dns.google`; do dig -x $ip | grep ^[0-9].*in-addr; done
 8.8.8.8.in-addr.arpa.	18561	IN	PTR	dns.google.
 4.4.8.8.in-addr.arpa.	21274	IN	PTR	dns.google.
-
+```
 
 dns.google
