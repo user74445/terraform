@@ -54,6 +54,8 @@ Referrer Policy: no-referrer-when-downgrade
 
 приложите скриншот консоли браузера в ответ.
 
+https://github.com/user74445/devops-netology/blob/main/11.JPG
+
 3. Какой IP адрес у вас в интернете?
 ```
 vagrant@vagrant:~$ dig @resolver4.opendns.com myip.opendns.com +short
