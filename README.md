@@ -216,10 +216,12 @@ Hosts/Net: 62                    Class A
 
 Linux: ip neigh, arp -n
 Windows: arp -a
+
 Очистить кеш:
 
 Linux: ip neigh flush
 Windows: arp -d *
+
 Удалить один IP так:
 
 Linux: ip neigh delete <IP> dev <INTERFACE>, arp -d <IP>
