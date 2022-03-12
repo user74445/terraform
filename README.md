@@ -100,4 +100,4 @@ UNCONN       0             0                              [::]:111              
 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.
 
 
-
+https://github.com/user74445/devops-netology/blob/main/pics/network.svg
