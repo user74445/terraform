@@ -1,228 +1,102 @@
-1. Проверьте список доступных сетевых интерфейсов на вашем компьютере. Какие команды есть для этого в Linux и в Windows?
+1 . Подключитесь к публичному маршрутизатору в интернет. Найдите маршрут к вашему публичному IP
 
-Linux
-```
-vagrant@vagrant:~$ ip link show
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-    link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff
-	
-vagrant@vagrant:~$ ifconfig -a
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
-        inet6 fe80::a00:27ff:feb1:285d  prefixlen 64  scopeid 0x20<link>
-        ether 08:00:27:b1:28:5d  txqueuelen 1000  (Ethernet)
-        RX packets 2203  bytes 1273771 (1.2 MB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 1141  bytes 125756 (125.7 KB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+telnet route-views.routeviews.org
+Username: rviews
+show ip route x.x.x.x/32
+show bgp x.x.x.x/32
 
-lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
-        inet 127.0.0.1  netmask 255.0.0.0
-        inet6 ::1  prefixlen 128  scopeid 0x10<host>
-        loop  txqueuelen 1000  (Local Loopback)
-        RX packets 14  bytes 1354 (1.3 KB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 14  bytes 1354 (1.3 KB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-```		
-		
-Windows
 
-ipconfig -all
-```
-Настройка протокола IP для Windows
+route-views>show ip route 94.242.x.x
+Routing entry for 94.242.0.0/19
+  Known via "bgp 6447", distance 20, metric 0
+  Tag 6939, type external
+  Last update from 64.71.137.241 1w3d ago
+  Routing Descriptor Blocks:
+  * 64.71.137.241, from 64.71.137.241, 1w3d ago
+      Route metric is 0, traffic share count is 1
+      AS Hops 2
+      Route tag 6939
+      MPLS label: none
+route-views>
 
-   Имя компьютера  . . . . . . . . . : DESKTOP-V7IO3NT
-   Основной DNS-суффикс  . . . . . . :
-   Тип узла. . . . . . . . . . . . . : Гибридный
-   IP-маршрутизация включена . . . . : Нет
-   WINS-прокси включен . . . . . . . : Нет
+2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
 
-Адаптер Ethernet Ethernet 2:
+Запуск модуля
 
-   DNS-суффикс подключения . . . . . :
-   Описание. . . . . . . . . . . . . : VirtualBox Host-Only Ethernet Adapter
-   Физический адрес. . . . . . . . . : 0A-00-27-00-00-0B
-   DHCP включен. . . . . . . . . . . : Нет
-   Автонастройка включена. . . . . . : Да
-   Локальный IPv6-адрес канала . . . : fe80::9b1:b895:677e:1690%11(Основной)
-   IPv4-адрес. . . . . . . . . . . . : 192.168.56.1(Основной)
-   Маска подсети . . . . . . . . . . : 255.255.255.0
-   Основной шлюз. . . . . . . . . :
-   IAID DHCPv6 . . . . . . . . . . . : 453640231
-   DUID клиента DHCPv6 . . . . . . . : 00-01-00-01-25-A1-AD-69-04-D9-F5-89-BA-80
-   DNS-серверы. . . . . . . . . . . : fec0:0:0:ffff::1%1
-                                       fec0:0:0:ffff::2%1
-                                       fec0:0:0:ffff::3%1
-   NetBios через TCP/IP. . . . . . . . : Включен
+echo "dummy" > /etc/modules-load.d/dummy.conf
+echo "options dummy numdummies=2" > /etc/modprobe.d/dummy.conf
 
-Адаптер Ethernet Ethernet:
+Настройка интерфейса через systemd
 
-   DNS-суффикс подключения . . . . . :
-   Описание. . . . . . . . . . . . . : Realtek PCIe GbE Family Controller
-   Физический адрес. . . . . . . . . : 04-D9-F5-89-BA-80
-   DHCP включен. . . . . . . . . . . : Да
-   Автонастройка включена. . . . . . : Да
-   Локальный IPv6-адрес канала . . . : fe80::ec4e:b066:8b7d:65cd%4(Основной)
-   IPv4-адрес. . . . . . . . . . . . : 192.168.0.109(Основной)
-   Маска подсети . . . . . . . . . . : 255.255.255.0
-   Аренда получена. . . . . . . . . . : 20 февраля 2022 г. 17:42:53
-   Срок аренды истекает. . . . . . . . . . : 27 февраля 2022 г. 17:42:53
-   Основной шлюз. . . . . . . . . : 192.168.0.1
-   DHCP-сервер. . . . . . . . . . . : 192.168.0.1
-   IAID DHCPv6 . . . . . . . . . . . : 100981237
-   DUID клиента DHCPv6 . . . . . . . : 00-01-00-01-25-A1-AD-69-04-D9-F5-89-BA-80
-   DNS-серверы. . . . . . . . . . . : 192.168.0.1
-   NetBios через TCP/IP. . . . . . . . : Включен
+cat << "EOF" >> /etc/systemd/network/10-dummy0.netdev
+[NetDev]
+Name=dummy0
+Kind=dummy
+EOF
+cat << "EOF" >> /etc/systemd/network/20-dummy0.network
+[Match]
+Name=dummy0
 
-Адаптер Ethernet Сетевое подключение Bluetooth:
+[Network]
+Address=10.0.8.1/24
+EOF
 
-   Состояние среды. . . . . . . . : Среда передачи недоступна.
-   DNS-суффикс подключения . . . . . :
-   Описание. . . . . . . . . . . . . : Bluetooth Device (Personal Area Network)
-   Физический адрес. . . . . . . . . : 00-1A-7D-DA-71-11
-   DHCP включен. . . . . . . . . . . : Да
-   Автонастройка включена. . . . . . : Да
-```
+Рестарт сети
 
-2. Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?
+# systemctl restart systemd-networkd
 
-Протокол LLDP.  
-Пакет lldpd.  
-Команда lldpctl.  
+Добавлен маршрут, конфигурация через netplan
 
-3. Какая технология используется для разделения L2 коммутатора на несколько виртуальных сетей? Какой пакет и команды есть в Linux для этого? Приведите пример конфига.
-
-Технология  VLAN (Virtual LAN).  
-Пакет в Ubuntu Linux - vlan  
-Пример конфига:  
-
-```
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
     ens4:
-      optional: yes
-      addresses: 
-        - 192.168.0.2/24
-  vlans:
-    vlan88:
-      id: 88
-      link: ens4 
+      optional: true
       addresses:
-        - 192.168.1.2/24
-```
+        - 10.0.0.3/24
+      routes:
+        - to: 10.0.4.0/24
+          via: 10.0.0.2
+		  
+Таблица маршрутизации, в ней один статический маршрут, метка static:
 
-4. Какие типы агрегации интерфейсов есть в Linux? Какие опции есть для балансировки нагрузки? Приведите пример конфига.
+vagrant@vagrant:~$ ip r
+default via 192.168.255.1 dev bond0 proto dhcp src 192.168.255.15 metric 100
+10.0.0.0/24 dev ens4 proto kernel scope link src 10.0.0.3
+10.0.1.0/24 dev vlan1001 proto kernel scope link src 10.0.1.3
+10.0.4.0/24 via 10.0.0.2 dev ens4 proto static
+10.0.8.0/24 dev dummy0 proto kernel scope link src 10.0.8.1
+192.168.255.0/24 dev bond0 proto kernel scope link src 192.168.255.15
+192.168.255.1 dev bond0 proto dhcp scope link src 192.168.255.15 metric 100
 
-В Linux есть две технологии агрегации (LAG): bonding и teaming.
+vagrant@vagrant: $ ip r | grep stat
+10.0.4.0/24 via 10.0.0.2 dev ens4 proto static
 
-Типы агрегации bonding:
-```
-$ modinfo bonding | grep mode:
-parm:           mode:Mode of operation; 0 for balance-rr, 1 for active-backup, 2 for balance-xor, 3 for broadcast, 4 for 802.3ad, 5 for balance-tlb, 6 for balance-alb (charp)
-active-backup и broadcast обеспечивают только отказоустойчивость
-balance-tlb, balance-alb, balance-rr, balance-xor и 802.3ad обеспечат отказоустойчивость и балансировку
+3. Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.
 
-balance-rr - Политика round-robin. Пакеты отправляются последовательно, начиная с первого доступного интерфейса и заканчивая последним. Эта политика применяется для балансировки нагрузки и отказоустойчивости.
-active-backup - Политика активный-резервный. Только один сетевой интерфейс из объединённых будет активным. Другой интерфейс может стать активным, только в том случае, когда упадёт текущий активный интерфейс. Эта политика применяется для отказоустойчивости.
-balance-xor - Политика XOR. Передача распределяется между сетевыми картами используя формулу: [( «MAC адрес источника» XOR «MAC адрес назначения») по модулю «число интерфейсов»]. Получается одна и та же сетевая карта передаёт пакеты одним и тем же получателям. Политика XOR применяется для балансировки нагрузки и отказоустойчивости.
-broadcast - Широковещательная политика. Передает всё на все сетевые интерфейсы. Эта политика применяется для отказоустойчивости.
-802.3ad - Политика агрегирования каналов по стандарту IEEE 802.3ad. Создаются агрегированные группы сетевых карт с одинаковой скоростью и дуплексом. При таком объединении передача задействует все каналы в активной агрегации, согласно стандарту IEEE 802.3ad. Выбор через какой интерфейс отправлять пакет определяется политикой по умолчанию XOR политика.
-balance-tlb - Политика адаптивной балансировки нагрузки передачи. Исходящий трафик распределяется в зависимости от загруженности каждой сетевой карты (определяется скоростью загрузки). Не требует дополнительной настройки на коммутаторе. Входящий трафик приходит на текущую сетевую карту. Если она выходит из строя, то другая сетевая карта берёт себе MAC адрес вышедшей из строя карты.
-balance-alb - Политика адаптивной балансировки нагрузки. Включает в себя политику balance-tlb плюс осуществляет балансировку входящего трафика. Не требует дополнительной настройки на коммутаторе. Балансировка входящего трафика достигается путём ARP переговоров.
+vagrant@vagrant:~$ vagrant@vagrant:~$ ss -tnlp
+State         Recv-Q        Send-Q               Local Address:Port               Peer Address:Port       Process
+LISTEN        0             4096                       0.0.0.0:111                     0.0.0.0:*
+LISTEN        0             4096                 127.0.0.53%lo:53                      0.0.0.0:*
+LISTEN        0             128                        0.0.0.0:22                      0.0.0.0:*
+LISTEN        0             4096                          [::]:111                        [::]:*
+LISTEN        0             128                           [::]:22                         [::]:*
 
-active-backup на отказоустойчивость:
+53 порт - это DNS.
 
- network:
-   version: 2
-   renderer: networkd
-   ethernets:
-     ens3:
-       dhcp4: no 
-       optional: true
-     ens5: 
-       dhcp4: no 
-       optional: true
-   bonds:
-     bond0: 
-       dhcp4: yes 
-       interfaces:
-         - ens3
-         - ens5
-       parameters:
-         mode: active-backup
-         primary: ens3
-         mii-monitor-interval: 2
-balance-alb - балансировка:
+22 порт - это SSH.
 
-   bonds:
-     bond0: 
-       dhcp4: yes 
-       interfaces:
-         - ens3
-         - ens5
-       parameters:
-         mode: balance-alb
-         mii-monitor-interval: 2
-```
+4. Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?
 
-5. Сколько IP адресов в сети с маской /29 ? Сколько /29 подсетей можно получить из сети с маской /24. Приведите несколько примеров /29 подсетей внутри сети 10.10.10.0/24.
-```
-$ ipcalc -b 10.10.10.0/29
-Address:   10.10.10.0
-Netmask:   255.255.255.248 = 29
-Wildcard:  0.0.0.7
-=>
-Network:   10.10.10.0/29
-HostMin:   10.10.10.1
-HostMax:   10.10.10.6
-Broadcast: 10.10.10.7
-Hosts/Net: 6                     Class A, Private Internet
-8 адресов = 6 для хостов, 1 адрес сети и 1 широковещательный адрес.
-```
-Сеть с маской /24 можно разбить на 32 подсети с маской /29
+vagrant@vagrant:~$ ss -unap
+State        Recv-Q        Send-Q                Local Address:Port               Peer Address:Port       Process
+UNCONN       0             0                     127.0.0.53%lo:53                      0.0.0.0:*
+UNCONN       0             0                    10.0.2.15%eth0:68                      0.0.0.0:*
+UNCONN       0             0                           0.0.0.0:111                     0.0.0.0:*
+UNCONN       0             0                              [::]:111                        [::]:*
 
-6. Задача: вас попросили организовать стык между 2-мя организациями. Диапазоны 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 уже заняты. Из какой подсети допустимо взять частные IP адреса? Маску выберите из расчета максимум 40-50 хостов внутри подсети.
-```
-Можно взять адреса из сети для CGNAT - 100.64.0.0/10.
-$ ipcalc -b 100.64.0.0/10 -s 50
-Address:   100.64.0.0
-Netmask:   255.192.0.0 = 10
-Wildcard:  0.63.255.255
-=>
-Network:   100.64.0.0/10
-HostMin:   100.64.0.1
-HostMax:   100.127.255.254
-Broadcast: 100.127.255.255
-Hosts/Net: 4194302               Class A
+53 порт - это DNS.
 
-1. Requested size: 50 hosts
-Netmask:   255.255.255.192 = 26
-Network:   100.64.0.0/26
-HostMin:   100.64.0.1
-HostMax:   100.64.0.62
-Broadcast: 100.64.0.63
-Hosts/Net: 62                    Class A
-```
-Маска для диапазонов будет /26, она позволит подключить 62 хоста.
-```
-7. Как проверить ARP таблицу в Linux, Windows? Как очистить ARP кеш полностью? Как из ARP таблицы удалить только один нужный IP?1. 
+68 порт использует DHCP для отправки сообщений клиентам.
 
-Проверить таблицу можно так:
+5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали.
 
-Linux: ip neigh, arp -n
-Windows: arp -a
 
-Очистить кеш:
 
-Linux: ip neigh flush
-Windows: arp -d *
-
-Удалить один IP так:
-
-Linux: ip neigh delete <IP> dev <INTERFACE>, arp -d <IP>
-Windows: arp -d <IP>
