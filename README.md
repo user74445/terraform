@@ -57,6 +57,7 @@
 
 *Приложить вывод команд установленных версий каждой из программ, оформленный в markdown.*
 
+```
 uttuer@uttuer:~$ virtualboxvm -h
 Oracle VM VirtualBox VM Runner v6.1.32_Ubuntu
 (C) 2005-2022 Oracle Corporation
