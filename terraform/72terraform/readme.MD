@@ -54,4 +54,4 @@ compute-default-zone: ru-central1-a
 1. Ответ на вопрос: при помощи какого инструмента (из разобранных на прошлом занятии) можно создать свой образ ami?
 [Packer](https://www.packer.io/)
 2. Ссылку на репозиторий с исходной конфигурацией терраформа.
-[terraform]()
+[terraform](https://github.com/user74445/terraform/tree/master/terraform/72terraform/terraform)
